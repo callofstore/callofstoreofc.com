@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CallOfStore - Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="site.css" />
+  <style>
+    .header-tools {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .cart-btn,
+    .about-btn {
+      height: 46px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 20, 40, 0.34);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+
+    .cart-btn {
+      position: relative;
+      padding: 0 1.3rem;
+      gap: 0.7rem;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .about-btn {
+      padding: 0 1.15rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .cart-btn:hover,
+    .about-btn:hover {
+      border-color: rgba(0, 224, 255, 0.2);
+      box-shadow: 0 8px 22px rgba(0, 224, 255, 0.1);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 900px) {
+      .header-container {
+        flex-wrap: wrap;
+        gap: 0.9rem;
+      }
+
+      .header-tools {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .header-tools,
+      .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-area,
+      .about-btn,
+      .cart-btn {
+        width: 100%;
+      }
+    }
+
+.support-menu {
+      position: relative;
+    }
+
+    .support-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 20, 40, 0.34);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    .support-btn:hover,
+    .support-btn.is-open {
+      border-color: rgba(0, 224, 255, 0.2);
+      box-shadow: 0 8px 22px rgba(0, 224, 255, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .support-popover {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 0;
+      width: 270px;
+      padding: 0.95rem;
+      border-radius: 22px;
+      border: 1px solid rgba(0, 224, 255, 0.14);
+      background:
+        linear-gradient(180deg, rgba(5, 18, 42, 0.72), rgba(3, 10, 28, 0.62));
+      box-shadow:
+        0 22px 60px rgba(0, 0, 0, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 1200;
+    }
+
+    .support-popover[hidden] {
+      display: none !important;
+    }
+
+    .support-popover-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .support-popover-subtitle {
+      margin: 0.2rem 0 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #d7d7d7;
+    }
+
+    .support-popover-divider {
+      height: 1px;
+      margin: 0.85rem 0 1rem;
+      background: linear-gradient(90deg, rgba(0, 224, 255, 0.14), transparent);
+    }
+
+    .support-link {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 1rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.03);
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 1rem;
+      font-weight: 700;
+      transition: all 0.25s ease;
+    }
+
+    .support-link + .support-link {
+      margin-top: 0.75rem;
+    }
+
+    .support-link:hover {
+      border-color: rgba(255, 80, 80, 0.22);
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .support-link i:first-child {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .support-link i:last-child {
+      font-size: 1.3rem;
+      min-width: 22px;
+    }
+
+    .support-link-label {
+      flex: 1;
+      text-align: left;
+    }
+
+    @media (max-width: 900px) {
+      .header-container {
+        flex-wrap: wrap;
+        gap: 0.9rem;
+      }
+
+      .header-tools {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .header-tools,
+      .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-area,
+      .about-btn,
+      .cart-btn {
+        width: 100%;
+      }
+    }
+
+    .page-view[hidden] {
+      display: none !important;
+    }
+
+    .about-page {
+      position: relative;
+      padding: 3.5rem 0 6rem;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .about-page::before,
+    .about-page::after {
+      content: "";
+      position: absolute;
+      inset: auto;
+      border-radius: 999px;
+      filter: blur(70px);
+      opacity: 0.38;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .about-page::before {
+      width: 320px;
+      height: 320px;
+      top: 70px;
+      left: -70px;
+      background: rgba(0, 224, 255, 0.26);
+    }
+
+    .about-page::after {
+      width: 360px;
+      height: 360px;
+      right: -90px;
+      bottom: 90px;
+      background: rgba(131, 72, 255, 0.24);
+    }
+
+    .about-wrapper {
+      position: relative;
+      width: min(1220px, calc(100% - 32px));
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.9rem;
+    }
+
+    .about-wrapper::before {
+      content: "";
+      position: absolute;
+      inset: 18px 0 auto;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(140, 236, 255, 0.24), transparent);
+      pointer-events: none;
+    }
+
+    .about-hero {
+      position: relative;
+      text-align: center;
+      padding: 2.2rem 1.4rem 2rem;
+      border-radius: 32px;
+      border: 1px solid rgba(140, 236, 255, 0.14);
+      background:
+        radial-gradient(circle at top, rgba(140, 236, 255, 0.12), transparent 38%),
+        linear-gradient(180deg, rgba(8, 24, 46, 0.92), rgba(4, 12, 24, 0.9));
+      box-shadow:
+        0 28px 70px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .about-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, transparent 0, rgba(140, 236, 255, 0.06) 45%, transparent 100%),
+        repeating-linear-gradient(90deg, transparent 0 118px, rgba(140, 236, 255, 0.05) 118px 119px);
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.25));
+      pointer-events: none;
+    }
+
+    .about-eyebrow {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 224, 255, 0.22);
+      background: rgba(0, 20, 40, 0.5);
+      color: #9ef1ff;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    .about-title {
+      position: relative;
+      margin: 0;
+      font-size: clamp(2.4rem, 5vw, 4.4rem);
+      line-height: 1;
+      color: #ffffff;
+      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    }
+
+    .about-title span {
+      color: #8cecff;
+      text-shadow: 0 0 24px rgba(140, 236, 255, 0.22);
+    }
+
+    .about-subtitle {
+      position: relative;
+      width: min(860px, 100%);
+      margin: 1.2rem auto 0;
+      font-size: 1.1rem;
+      line-height: 1.9;
+      color: #eef7ff;
+      text-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+    }
+
+    .about-card,
+    .about-feature,
+    .about-cta {
+      position: relative;
+      border-radius: 28px;
+      border: 1px solid rgba(140, 236, 255, 0.12);
+      background:
+        linear-gradient(180deg, rgba(9, 22, 42, 0.92), rgba(4, 12, 24, 0.96));
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+    }
+
+    .about-card::before,
+    .about-feature::before,
+    .about-cta::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(140, 236, 255, 0.08), transparent 34%, transparent 60%, rgba(131, 72, 255, 0.08));
+      pointer-events: none;
+    }
+
+    .about-card {
+      padding: 2.2rem;
+    }
+
+    .about-card h2,
+    .about-section-title {
+      position: relative;
+      margin: 0 0 1rem;
+      color: #ffffff;
+      font-size: clamp(1.7rem, 2.4vw, 2.35rem);
+      letter-spacing: -0.02em;
+    }
+
+    .about-section-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      margin-bottom: 1.3rem;
+    }
+
+    .about-section-title::after {
+      content: "";
+      width: 86px;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(140, 236, 255, 0.65), transparent);
+    }
+
+    .about-card p,
+    .about-feature p,
+    .about-cta p {
+      position: relative;
+      margin: 0;
+      color: #b9cde0;
+      line-height: 1.85;
+      font-size: 1rem;
+    }
+
+    .about-card-content {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .about-grid,
+    .about-features-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .about-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .about-features-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .about-feature {
+      padding: 1.7rem;
+      transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+      backdrop-filter: blur(6px);
+    }
+
+    .about-feature:hover {
+      transform: translateY(-4px);
+      border-color: rgba(140, 236, 255, 0.24);
+      box-shadow:
+        0 26px 60px rgba(0, 0, 0, 0.34),
+        0 0 0 1px rgba(140, 236, 255, 0.05) inset;
+    }
+
+    .about-icon {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+      margin-bottom: 1rem;
+      font-size: 1.12rem;
+      color: #ffffff;
+      background: rgba(140, 236, 255, 0.14);
+      border: 1px solid rgba(140, 236, 255, 0.16);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .about-feature h3 {
+      position: relative;
+      margin: 0 0 0.8rem;
+      color: #ffffff;
+      font-size: 1.7rem;
+      letter-spacing: -0.02em;
+    }
+
+    .about-feature--green .about-icon {
+      background: rgba(35, 201, 122, 0.16);
+      border-color: rgba(35, 201, 122, 0.22);
+      box-shadow: 0 10px 24px rgba(35, 201, 122, 0.12);
+    }
+
+    .about-feature--blue .about-icon {
+      background: rgba(72, 140, 255, 0.16);
+      border-color: rgba(72, 140, 255, 0.22);
+      box-shadow: 0 10px 24px rgba(72, 140, 255, 0.12);
+    }
+
+    .about-feature--purple .about-icon {
+      background: rgba(179, 90, 255, 0.16);
+      border-color: rgba(179, 90, 255, 0.22);
+      box-shadow: 0 10px 24px rgba(179, 90, 255, 0.12);
+    }
+
+    .about-feature--gold .about-icon {
+      background: rgba(235, 191, 44, 0.16);
+      border-color: rgba(235, 191, 44, 0.22);
+      box-shadow: 0 10px 24px rgba(235, 191, 44, 0.12);
+    }
+
+    .about-cta {
+      padding: 2.8rem 2.1rem;
+      text-align: center;
+      background:
+        radial-gradient(circle at top, rgba(191, 128, 255, 0.2), transparent 42%),
+        linear-gradient(135deg, rgba(62, 16, 102, 0.92), rgba(17, 28, 56, 0.96));
+      border-color: rgba(186, 116, 255, 0.22);
+    }
+
+    .about-cta h2 {
+      position: relative;
+      margin: 0 0 1rem;
+      color: #ffffff;
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      letter-spacing: -0.03em;
+    }
+
+    .about-cta p {
+      width: min(760px, 100%);
+      margin: 0 auto;
+      color: #d8dff1;
+    }
+
+    .about-cta-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1.7rem;
+    }
+
+    .about-cta-btn {
+      min-width: 240px;
+      height: 58px;
+      padding: 0 1.5rem;
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 700;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+    }
+
+    .about-cta-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .about-cta-btn--primary {
+      color: #ffffff;
+      border: 1px solid rgba(179, 90, 255, 0.34);
+      background: linear-gradient(135deg, #8a2be2, #b251ff);
+      box-shadow: 0 16px 34px rgba(138, 43, 226, 0.28);
+    }
+
+    .about-cta-btn--primary:hover {
+      box-shadow: 0 20px 42px rgba(138, 43, 226, 0.34);
+    }
+
+    .about-cta-btn--secondary {
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+    }
+
+    .about-cta-btn--secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    @media (max-width: 900px) {
+      .about-grid,
+      .about-features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .about-feature h3 {
+        font-size: 1.45rem;
+      }
+
+      .about-hero {
+        padding: 1.8rem 1rem 1.6rem;
+      }
+    }
+
+
+    .about-links-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .about-inline-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #b986ff;
+      font-weight: 700;
+      font-size: 0.98rem;
+      text-decoration: none;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .about-inline-link:hover {
+      color: #d7b8ff;
+      transform: translateY(-1px);
+    }
+
+    .terms-page {
+      position: relative;
+      padding: 140px 24px 72px;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .terms-page::before,
+    .terms-page::after {
+      content: '';
+      position: absolute;
+      inset: auto;
+      border-radius: 999px;
+      filter: blur(90px);
+      opacity: 0.32;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .terms-page::before {
+      width: 320px;
+      height: 320px;
+      top: 90px;
+      left: -70px;
+      background: rgba(158, 108, 255, 0.34);
+    }
+
+    .terms-page::after {
+      width: 280px;
+      height: 280px;
+      top: 260px;
+      right: -60px;
+      background: rgba(67, 137, 255, 0.18);
+    }
+
+    .terms-wrapper {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 960px);
+      margin: 0 auto;
+    }
+
+    .terms-hero {
+      text-align: center;
+      margin-bottom: 34px;
+    }
+
+    .terms-title {
+      margin: 0;
+      font-size: clamp(2.6rem, 5vw, 4rem);
+      line-height: 1.04;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: #a56cff;
+    }
+
+    .terms-updated {
+      margin: 14px 0 0;
+      color: rgba(230, 235, 255, 0.75);
+      font-size: 0.98rem;
+    }
+
+    .terms-updated strong {
+      color: #ffffff;
+      font-weight: 800;
+    }
+
+    .terms-card {
+      position: relative;
+      padding: 44px 48px;
+      border-radius: 26px;
+      border: 1px solid rgba(173, 128, 255, 0.18);
+      background: linear-gradient(180deg, rgba(15, 18, 34, 0.95) 0%, rgba(20, 23, 42, 0.92) 100%);
+      box-shadow: 0 26px 70px rgba(0, 0, 0, 0.34);
+      backdrop-filter: blur(16px);
+    }
+
+    .terms-section + .terms-section {
+      margin-top: 34px;
+    }
+
+    .terms-section h2 {
+      margin: 0 0 18px;
+      color: #ffffff;
+      font-size: clamp(1.55rem, 2.4vw, 2.15rem);
+      line-height: 1.15;
+      font-weight: 800;
+    }
+
+    .terms-section h3 {
+      margin: 0 0 14px;
+      color: #ffffff;
+      font-size: clamp(1.18rem, 1.9vw, 1.5rem);
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    .terms-section p,
+    .terms-section li {
+      margin: 0;
+      color: rgba(236, 240, 255, 0.92);
+      font-size: 1.03rem;
+      line-height: 1.75;
+    }
+
+    .terms-list {
+      display: grid;
+      gap: 16px;
+      padding: 0 0 0 22px;
+      margin: 0;
+    }
+
+    .terms-list li::marker {
+      color: #a56cff;
+    }
+
+
+    .terms-important-box {
+      margin-top: 34px;
+      padding: 22px 24px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 193, 7, 0.42);
+      background: linear-gradient(180deg, rgba(62, 45, 18, 0.82) 0%, rgba(43, 33, 16, 0.88) 100%);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+    }
+
+    .terms-important-box p {
+      margin: 0;
+      color: #ffcc33;
+      font-size: 1.02rem;
+      line-height: 1.65;
+      font-weight: 700;
+    }
+
+    @media (max-width: 720px) {
+      .terms-page {
+        padding-top: 128px;
+      }
+
+      .terms-card {
+        padding: 30px 22px;
+        border-radius: 22px;
+      }
+
+      .terms-section h2 {
+        font-size: 1.42rem;
+      }
+
+      .terms-section h3 {
+        font-size: 1.12rem;
+      }
+
+      .terms-section p,
+      .terms-section li {
+        font-size: 0.98rem;
+      }
+    }
+
+
+    .faq-page {
+      position: relative;
+      padding: 3.5rem 0 6rem;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .faq-page::before,
+    .faq-page::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(80px);
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .faq-page::before {
+      width: 340px;
+      height: 340px;
+      top: 60px;
+      left: -80px;
+      background: rgba(131, 72, 255, 0.22);
+    }
+
+    .faq-page::after {
+      width: 360px;
+      height: 360px;
+      right: -90px;
+      bottom: 90px;
+      background: rgba(0, 224, 255, 0.18);
+    }
+
+    .faq-wrapper {
+      width: min(100%, 980px);
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    .faq-hero {
+      text-align: center;
+      margin-bottom: 2.4rem;
+    }
+
+    .faq-title {
+      margin: 0;
+      font-size: clamp(2.6rem, 7vw, 4rem);
+      font-weight: 900;
+      line-height: 1.05;
+      color: #a866ff;
+      letter-spacing: -0.04em;
+    }
+
+    .faq-subtitle {
+      max-width: 760px;
+      margin: 1rem auto 0;
+      color: #ffffff;
+      text-shadow: 0 0 14px rgba(255, 255, 255, 0.12), 0 0 26px rgba(168, 102, 255, 0.18);
+      font-size: clamp(1rem, 2.4vw, 1.15rem);
+      line-height: 1.6;
+    }
+
+    .faq-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .faq-item {
+      border-radius: 22px;
+      border: 1px solid rgba(168, 102, 255, 0.16);
+      background: linear-gradient(180deg, rgba(20, 24, 48, 0.96), rgba(12, 15, 31, 0.98));
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+      overflow: hidden;
+      transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .faq-item:hover {
+      border-color: rgba(168, 102, 255, 0.28);
+      transform: translateY(-1px);
+      box-shadow: 0 22px 58px rgba(0, 0, 0, 0.28);
+    }
+
+    .faq-item[open] {
+      border-color: rgba(168, 102, 255, 0.42);
+      box-shadow: 0 24px 64px rgba(88, 38, 160, 0.22);
+    }
+
+    .faq-question {
+      list-style: none;
+      cursor: pointer;
+      padding: 1.5rem 1.55rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: clamp(1rem, 2.6vw, 1.12rem);
+      font-weight: 800;
+      color: #ffffff;
+      transition: color 0.2s ease;
+    }
+
+    .faq-question:hover {
+      color: #f6f1ff;
+    }
+
+    .faq-question::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-question::after {
+      content: "078";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      font-size: 0.92rem;
+      color: #c48cff;
+      transition: transform 0.24s ease, color 0.24s ease;
+      flex-shrink: 0;
+    }
+
+    .faq-item[open] .faq-question::after {
+      transform: rotate(180deg);
+      color: #f0d3ff;
+    }
+
+    .faq-answer {
+      padding: 0 1.55rem 1.55rem;
+      color: #d2d8ea;
+      font-size: 1rem;
+      line-height: 1.82;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0));
+    }
+
+    .faq-answer p {
+      margin: 0;
+    }
+
+    .faq-answer p + p {
+      margin-top: 0.95rem;
+    }
+
+    .faq-cta {
+      margin-top: 2rem;
+      padding: 2.5rem 1.6rem;
+      border-radius: 28px;
+      border: 1px solid rgba(168, 102, 255, 0.24);
+      background: radial-gradient(circle at top, rgba(168, 102, 255, 0.22), rgba(78, 32, 145, 0.14) 38%, rgba(25, 14, 48, 0.96) 100%);
+      box-shadow: 0 24px 60px rgba(44, 13, 92, 0.28);
+      text-align: center;
+    }
+
+    .faq-cta h2 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: -0.03em;
+    }
+
+    .faq-cta p {
+      margin: 0.9rem auto 0;
+      max-width: 680px;
+      color: #ffffff;
+      text-shadow: 0 0 14px rgba(255, 255, 255, 0.12), 0 0 24px rgba(168, 102, 255, 0.16);
+      font-size: clamp(1rem, 2.3vw, 1.12rem);
+      line-height: 1.7;
+    }
+
+    .faq-cta-actions {
+      margin-top: 1.55rem;
+      display: flex;
+      justify-content: center;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+    }
+
+    .faq-cta-btn {
+      min-width: 190px;
+      padding: 0.95rem 1.35rem;
+      border-radius: 16px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+
+    .faq-cta-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .faq-cta-btn--instagram {
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(135deg, #ff4fd8, #8b5cff);
+      box-shadow: 0 16px 36px rgba(139, 92, 255, 0.28);
+    }
+
+    .faq-cta-btn--discord {
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(135deg, #5865f2, #7b5cff);
+      box-shadow: 0 16px 36px rgba(88, 101, 242, 0.26);
+    }
+
+    @media (max-width: 720px) {
+      .faq-question {
+        padding: 1.3rem 1.15rem;
+      }
+
+      .faq-answer {
+        padding: 0 1.15rem 1.3rem;
+      }
+
+      .faq-cta {
+        padding: 2rem 1.1rem;
+        border-radius: 22px;
+      }
+
+      .faq-cta-actions {
+        flex-direction: column;
+      }
+
+      .faq-cta-btn {
+        width: 100%;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="lightning-bg" id="lightningBg"></div>
+
+  <header class="header">
+    <div class="header-container">
+      <a class="logo-area logo-link" href="index.html" aria-label="Voltar para a home CallOfStore">
+        <span class="logo-text hacker-logo" data-text="CallOfStore">CallOfStore</span>
+      </a>
+
+      <div class="header-tools">
+        <div class="search-area">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" id="searchInput" placeholder="Procure pelo nome do produto" autocomplete="off" />
+          <div class="search-results" id="searchResults" hidden></div>
+        </div>
+
+        <div class="header-actions">
+          <button class="cart-btn" type="button" aria-label="Carrinho">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count">0</span>
+          </button>
+          <a class="about-btn" href="#sobre-nos">Sobre-nós</a>
+
+          <div class="support-menu">
+            <button class="support-btn" type="button" id="supportToggle" aria-label="Suporte" aria-expanded="false" aria-controls="supportPopover">
+              <i class="fas fa-headset"></i>
+            </button>
+
+            <div class="support-popover" id="supportPopover" hidden>
+              <p class="support-popover-title">Suporte Especializado</p>
+              <p class="support-popover-subtitle">Call Of Store</p>
+              <div class="support-popover-divider"></div>
+
+              <a class="support-link" href="https://www.instagram.com/callofstoreoficial?igsh=NmUxY3BwcWdoYWJt" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-arrow-up-right-from-square"></i>
+                <i class="fab fa-instagram"></i>
+                <span class="support-link-label">Instagram</span>
+              </a>
+
+              <a class="support-link" href="https://discord.gg/Kzp3a7fSFd" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-arrow-up-right-from-square"></i>
+                <i class="fab fa-discord"></i>
+                <span class="support-link-label">Discord</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="ticker-container">
+    <div class="ticker-content" id="tickerContent"></div>
+  </div>
+
+  <main id="main-content" class="page-view">
+    <div class="main-content">
+      <section class="hero-section">
+        <h1 class="hero-title">A Melhor Loja de Produtos Digitais</h1>
+        <p class="hero-subtitle">Bem-vindo(a) à <span class="hero-highlight">Call Of Store</span>! Somos referência no mercado de <span class="hero-highlight">produtos digitais</span>, oferecendo desde os jogos do momento até os clássicos mais amados, sempre com preços imperdíveis.</p>
+
+        <div class="badges">
+          <span class="badge">100% Seguro</span>
+          <span class="badge">Entrega Rápida</span>
+          <span class="badge">Garantia 14D</span>
+          <span class="badge">Suporte 24/7</span>
+        </div>
+
+        <div class="metrics">
+          <div class="metric-item">
+            <span class="metric-value">+100</span>
+            <span class="metric-label">Clientes Satisfeitos</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-value">4.8/5</span>
+            <span class="metric-label">Avaliações Médias</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-value">99.8%</span>
+            <span class="metric-label">Taxa de Satisfação</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="category-section">
+        <h2 class="category-title">NOVIDADES</h2>
+        <div class="products-grid" id="novidadesGrid"></div>
+      </section>
+
+      <section class="category-section">
+        <h2 class="category-title">MAIS POPULARES</h2>
+        <div class="products-grid" id="maisPopularesGrid"></div>
+      </section>
+
+      <section class="category-section">
+        <h2 class="category-title">MAIS JOGOS</h2>
+        <div class="products-grid" id="maisJogosGrid"></div>
+      </section>
+
+      <section class="category-section">
+        <h2 class="category-title">APENAS R$ 4,90</h2>
+        <div class="products-grid" id="apenas490Grid"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <main id="sobre-nos" class="page-view about-page" hidden>
+    <div class="about-wrapper">
+      <section class="about-hero">
+        <span class="about-eyebrow"><i class="fas fa-gamepad"></i> Sobre a loja</span>
+        <h1 class="about-title">Sobre a <span>CallOfStore</span></h1>
+        <p class="about-subtitle">Sua loja de produtos digitais, oferecendo os melhores preços e uma experiência simples, rápida e segura para comprar seus produtos digitais.</p>
+      </section>
+
+      <section class="about-card">
+        <h2>Nossa História</h2>
+        <div class="about-card-content">
+          <p>A CallOfStore nasceu com a missão de democratizar o acesso aos melhores jogos e produtos digitais, oferecendo opções com excelente custo-benefício para quem quer economizar sem abrir mão da qualidade.</p>
+          <p>Fundada com o objetivo de tornar as compras mais acessíveis, trabalhamos todos os dias para negociar as melhores ofertas e entregar uma experiência de compra simples, rápida e segura.</p>
+          <p>Acreditamos que mais pessoas devem ter acesso aos títulos e conteúdos que desejam, independentemente do orçamento. Por isso, buscamos sempre preços competitivos, suporte eficiente e um processo de compra sem complicação.</p>
+          <div class="about-links-row">
+            <a class="about-inline-link" href="#termos-de-uso"><i class="fas fa-file-lines"></i> Termos de Uso</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="about-grid">
+        <article class="about-feature">
+          <div class="about-icon"><i class="fas fa-check-circle"></i></div>
+          <h3>Nossa Missão</h3>
+          <p>Tornar os melhores jogos e produtos digitais mais acessíveis para todos, oferecendo ótimos preços, praticidade e confiança em cada compra.</p>
+        </article>
+
+        <article class="about-feature">
+          <div class="about-icon"><i class="fas fa-eye"></i></div>
+          <h3>Nossa Visão</h3>
+          <p>Ser uma referência no mercado digital brasileiro, reconhecida pela qualidade do atendimento, pela confiabilidade e pela experiência entregue ao cliente.</p>
+        </article>
+
+        <article class="about-feature">
+          <div class="about-icon"><i class="fas fa-users"></i></div>
+          <h3>Nossos Valores</h3>
+          <p>Transparência, qualidade, segurança e compromisso com a satisfação do cliente são os pilares que guiam o trabalho da CallOfStore.</p>
+        </article>
+      </section>
+
+      <section>
+        <h2 class="about-section-title">Por Que Escolher a CallOfStore?</h2>
+        <div class="about-features-grid">
+          <article class="about-feature about-feature--green">
+            <div class="about-icon"><i class="fas fa-dollar-sign"></i></div>
+            <h3>Melhores Preços</h3>
+            <p>Jogos incríveis com excelente custo-benefício, ofertas atrativas e preços acessíveis para todos os bolsos.</p>
+          </article>
+
+          <article class="about-feature about-feature--blue">
+            <div class="about-icon"><i class="fas fa-shield-halved"></i></div>
+            <h3>Segurança Garantida</h3>
+            <p>Compre com segurança e receba atendimento confiável em todas as etapas, do pagamento à entrega.</p>
+          </article>
+
+          <article class="about-feature about-feature--purple">
+            <div class="about-icon"><i class="fas fa-bolt"></i></div>
+            <h3>Entrega Rápida</h3>
+            <p>Receba seus jogos via Discord em até 5 minutos após a confirmação do pagamento.</p>
+          </article>
+
+          <article class="about-feature about-feature--gold">
+            <div class="about-icon"><i class="fas fa-gamepad"></i></div>
+            <h3>Experiência Sem Complicação</h3>
+            <p>Navegação simples, suporte direto e um processo de compra rápido e prático do começo ao fim.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="about-cta">
+        <h2>Pronto para Começar?</h2>
+        <p>Explore nosso catálogo completo e descubra os melhores produtos digitais com preços competitivos. Comece sua jornada com a CallOfStore agora mesmo.</p>
+        <div class="about-cta-actions">
+          <a class="about-cta-btn about-cta-btn--primary" href="#"><i class="fas fa-magnifying-glass"></i> Explorar Catálogo</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <main id="termos-de-uso" class="page-view terms-page" hidden>
+    <div class="terms-wrapper">
+      <section class="terms-hero">
+        <h1 class="terms-title">Termos de Uso</h1>
+        <p class="terms-updated">Última atualização: <strong>25/03/2026</strong></p>
+      </section>
+
+      <section class="terms-card">
+        <section class="terms-section">
+          <h2>1. Aceitação dos Termos</h2>
+          <p>Ao acessar e utilizar a CallOfStore, você concorda em cumprir e estar vinculado aos seguintes Termos de Uso. Se você não concorda com qualquer parte destes termos, não deve utilizar nossos serviços.</p>
+        </section>
+
+        <section class="terms-section">
+          <h2>2. Definições</h2>
+          <ul class="terms-list">
+            <li>"CallOfStore" refere-se à marca comercial.</li>
+            <li>"Usuário" ou "Cliente" refere-se à pessoa física ou jurídica que utiliza nossos serviços.</li>
+            <li>"Key" refere-se a Chave de acesso do jogo escolhido pelo cliente/usuário.</li>
+            <li>"Serviço" refere-se à venda de acesso aos produtos digitais/jogos do catálogo.</li>
+          </ul>
+        </section>
+
+        <section class="terms-section">
+          <h2>3. Natureza do Serviço</h2>
+          <p>A CallOfStore revende o acesso de jogos da plataforma Steam. É importante entender que:</p>
+          <ul class="terms-list">
+            <li>Os jogos são ativados utilizando um ativador de nossos fornecedores;</li>
+            <li>Recomendamos o uso do modo offline da Steam para evitar interrupções em contas que estão marcadas como conta compartilhada;</li>
+            <li>O cliente é responsável por guardar com segurança as keys fornecidas pela CallOfStore após suas compras.</li>
+          </ul>
+        </section>
+
+        <section class="terms-section">
+          <h2>4. Responsabilidades do Cliente</h2>
+          <p>O cliente se compromete a:</p>
+          <ul class="terms-list">
+            <li>Utilizar nossos serviços para fins pessoais e lícitos;</li>
+            <li>Não tentar alterar senhas, e-mails ou qualquer configuração de contas marcadas como compartilhadas;</li>
+            <li>Não compartilhar as credenciais com terceiros;</li>
+            <li>Informar imediatamente caso identifique qualquer problema com nossos serviços;</li>
+          </ul>
+        </section>
+
+        <section class="terms-section">
+          <h2>5. Limitação de Responsabilidade</h2>
+          <p>A CallOfStore não se responsabiliza por:</p>
+          <ul class="terms-list">
+            <li>Interrupções no acesso causadas por ações de terceiros ou da plataforma Steam;</li>
+            <li>Danos decorrentes do uso inadequado de nossos serviços pelo cliente;</li>
+            <li>Alterações nas políticas da Steam que possam afetar o uso dos jogos;</li>
+            <li>Problemas técnicos do cliente, incluindo hardware, software ou conexão de internet;</li>
+            <li>Uso ilícito ou que viole os termos de serviço da Steam.</li>
+          </ul>
+          <p>A CallOfStore se compromete a fornecer chaves e contas funcionais no momento da entrega.</p>
+        </section>
+
+        <section class="terms-section">
+          <h2>6. Política de Reembolso e Garantia</h2>
+          <p>Conforme o Código de Defesa do Consumidor (Lei 8.078/90):</p>
+          <ul class="terms-list">
+            <li>Garantia de 14 dias: oferecemos garantia de 14 dias corridos a partir da data de entrega;</li>
+            <li>Reembolso: reembolsos serão processados apenas se o produto estiver inacessível ou não funcionar corretamente no momento da entrega;</li>
+            <li>Troca: em caso de problemas, podemos oferecer troca por outro jogo equivalente, quando disponível;</li>
+            <li>Exclusões: não há direito a reembolso após 14 dias, em caso de compartilhamento com terceiros ou uso inadequado do produto;</li>
+            <li>Prazo de reembolso: reembolsos aprovados serão processados em até 14 dias úteis.</li>
+          </ul>
+        </section>
+
+        <section class="terms-section">
+          <h2>7. Propriedade Intelectual</h2>
+          <p>Todos os jogos comercializados são propriedade de seus respectivos desenvolvedores e editores. A CallOfStore atua apenas como intermediária na comercialização de acesso a chaves e contas compartilhadas. Todos os direitos autorais dos jogos pertencem aos seus criadores originais.</p>
+        </section>
+
+        <section class="terms-section">
+          <h2>8. Uso Proibido</h2>
+          <p>É expressamente proibido:</p>
+          <ul class="terms-list">
+            <li>Tentar alterar senhas, e-mails ou configurações da conta fornecida;</li>
+            <li>Compartilhar credenciais com terceiros;</li>
+            <li>Utilizar a conta para atividades ilícitas ou que violem os termos da Steam;</li>
+            <li>Tentar obter acesso não autorizado a outros jogos ou sistemas;</li>
+            <li>Revender ou sublicenciar o acesso sem autorização;</li>
+            <li>Realizar engenharia reversa ou tentar copiar jogos.</li>
+          </ul>
+          <p>O descumprimento destas regras resultará no cancelamento imediato do acesso, sem direito a reembolso, e poderá resultar em medidas legais.</p>
+        </section>
+
+        <section class="terms-section">
+          <h2>9. Modificações nos Termos</h2>
+          <p>A CallOfStore reserva-se o direito de modificar estes Termos de Uso a qualquer momento. As alterações entrarão em vigor imediatamente após a publicação no site. É responsabilidade do usuário revisar periodicamente estes termos. O uso continuado dos serviços após as modificações constitui aceitação dos novos termos.</p>
+        </section>
+
+        <section class="terms-section">
+          <h2>10. Contato</h2>
+          <p>Para questões relacionadas a estes Termos de Uso, entre em contato conosco através de:</p>
+          <ul class="terms-list">
+            <li>Email: callofstoreoficial@gmail.com</li>
+          </ul>
+        </section>
+
+        <div class="terms-important-box">
+          <p>Importante: Ao utilizar nossos serviços, você declara ter lido, compreendido e concordado com todos os termos acima. Se você não concorda com qualquer parte destes termos, não deve utilizar nossos serviços.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+
+  <main id="politica-de-privacidade" class="page-view terms-page" hidden>
+    <div class="terms-wrapper">
+      <section class="terms-hero">
+        <h1 class="terms-title">Política de Privacidade</h1>
+        <p class="terms-updated">Última atualização: <strong>25/03/2026</strong></p>
+      </section>
+
+      <section class="terms-card">
+        <section class="terms-section">
+          <h2>1. Dados Coletados</h2>
+          <p>Coletamos apenas os dados necessários para processar seus pedidos, prestar suporte e operar nossos serviços de forma segura.</p>
+        </section>
+
+        <section class="terms-section">
+          <h3>1.1. Dados de Identificação:</h3>
+          <ul class="terms-list">
+            <li>Nome completo</li>
+            <li>CPF, quando necessário para processamento do pagamento</li>
+            <li>Data de nascimento, quando exigida pela plataforma de pagamento</li>
+            <li>Endereço de e-mail</li>
+          </ul>
+        </section>
+
+        <section class="terms-section">
+          <h3>1.2. Dados de Compra e Atendimento:</h3>
+          <ul class="terms-list">
+            <li>Informações relacionadas ao pedido realizado</li>
+            <li>Histórico de compras</li>
+            <li>Mensagens trocadas em canais de atendimento e suporte</li>
+          </ul>
+        </section>
+
+        <section class="terms-section">
+          <h3>1.3. Dados Técnicos:</h3>
+          <ul class="terms-list">
+            <li>Endereço IP</li>
+            <li>Informações do navegador e dispositivo</li>
+            <li>Cookies e tecnologias similares</li>
+          </ul>
+        </section>
+
+        <section class="terms-section">
+          <h2>2. Finalidade do Uso dos Dados</h2>
+          <p>Utilizamos seus dados pessoais para:</p>
+          <ul class="terms-list">
+            <li>Processar e gerenciar suas compras;</li>
+            <li>Entregar chaves, acessos e instruções relacionadas aos produtos adquiridos;</li>
+            <li>Nos comunicar com você sobre pedidos, produtos e serviços;</li>
+            <li>Fornecer suporte ao cliente;</li>
+            <li>Cumprir obrigações legais e regulatórias;</li>
+            <li>Melhorar nossos serviços e a experiência do usuário;</li>
+            <li>Prevenir fraudes e reforçar a segurança da plataforma.</li>
+          </ul>
+        </section>
+
+        <section class="terms-section">
+          <h2>3. Base Legal para o Tratamento de Dados</h2>
+          <p>O tratamento de seus dados pessoais poderá ocorrer com base nas seguintes hipóteses legais da LGPD:</p>
+          <ul class="terms-list">
+            <li><strong>Execução de contrato:</strong> para cumprir obrigações relacionadas à compra e entrega dos produtos;</li>
+            <li><strong>Consentimento:</strong> quando necessário para determinadas finalidades específicas;</li>
+            <li><strong>Cumprimento de obrigação legal:</strong> para atender exigências legais e regulatórias;</li>
+            <li><strong>Legítimo interesse:</strong> para prevenção de fraudes, segurança da plataforma e melhoria dos serviços.</li>
+          </ul>
+        </section>
+
+        <section class="terms-section">
+          <h2>4. Compartilhamento de Dados</h2>
+          <p>Seus dados pessoais poderão ser compartilhados apenas quando isso for necessário para a operação dos nossos serviços, nas seguintes situações:</p>
+          <ul class="terms-list">
+            <li><strong>Processadores de pagamento:</strong> para processar transações financeiras com segurança;</li>
+            <li><strong>Prestadores de serviços:</strong> empresas que auxiliam na operação do site e do atendimento, sob obrigação de confidencialidade;</li>
+            <li><strong>Autoridades competentes:</strong> quando houver exigência legal, ordem judicial ou requisição de autoridade competente;</li>
+            <li><strong>Com seu consentimento:</strong> em outras situações, apenas quando houver autorização expressa.</li>
+          </ul>
+          <p><strong>Não vendemos, alugamos ou comercializamos seus dados pessoais para terceiros.</strong></p>
+        </section>
+
+        <section class="terms-section">
+          <h2>5. Segurança das Informações</h2>
+          <p>Adotamos medidas técnicas e organizacionais razoáveis para proteger os dados pessoais tratados pela CallOfStore contra acesso não autorizado, uso indevido, alteração, divulgação ou destruição.</p>
+        </section>
+
+        <section class="terms-section">
+          <h2>6. Direitos do Usuário</h2>
+          <p>Nos termos da legislação aplicável, o usuário poderá solicitar informações sobre o tratamento de seus dados, bem como pedir correção, atualização ou exclusão, quando cabível.</p>
+        </section>
+
+        <section class="terms-section">
+          <h2>7. Alterações nesta Política</h2>
+          <p>Esta Política de Privacidade poderá ser atualizada a qualquer momento para refletir mudanças operacionais, melhorias internas ou exigências legais. Recomendamos a revisão periódica desta página.</p>
+        </section>
+
+        <section class="terms-section">
+          <h2>8. Contato</h2>
+          <p>Em caso de dúvidas sobre esta Política de Privacidade, entre em contato conosco através de:</p>
+          <ul class="terms-list">
+            <li>Email: callofstoreoficial@gmail.com</li>
+          </ul>
+        </section>
+
+        <div class="terms-important-box">
+          <p>Importante: Ao utilizar nossos serviços, você declara estar ciente desta Política de Privacidade e concorda com o tratamento dos dados necessários para a execução dos serviços oferecidos pela CallOfStore.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+
+  <main id="faq" class="page-view faq-page" hidden>
+    <div class="faq-wrapper">
+      <section class="faq-hero">
+        <h1 class="faq-title">Perguntas Frequentes</h1>
+        <p class="faq-subtitle">Encontre respostas para as dúvidas mais comuns sobre nossos serviços, produtos e políticas.</p>
+      </section>
+
+      <section class="faq-list" aria-label="Perguntas frequentes">
+        <details class="faq-item">
+          <summary class="faq-question">Como funciona a compra na CallOfStore?</summary>
+          <div class="faq-answer">
+            <p>Após escolher um dos jogos do nosso catálogo e concluir a compra, você receberá uma key para ativação. Em seguida, basta ativar o jogo em uma de suas contas Steam por meio do ativador fornecido por nosso fornecedor. Após a ativação, o jogo ficará disponível na sua biblioteca, podendo ser instalado e jogado sempre que desejar.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">O que são contas marcadas como compartilhadas?</summary>
+          <div class="faq-answer">
+            <p>As contas marcadas como compartilhadas funcionam de forma diferente dos jogos ativados diretamente na sua biblioteca. Nesse caso, você receberá uma key de login para acessar a conta que já possui o jogo desejado. Depois disso, basta seguir um processo semelhante ao explicado na primeira pergunta para começar a jogar.</p>
+            <p>Por se tratar de uma conta compartilhada, ela pode ser utilizada por mais de uma pessoa. Para evitar interrupções durante o uso, recomendamos manter a Steam no <strong>modo offline</strong> enquanto estiver jogando.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">Quanto tempo leva para receber meus produtos após o pagamento?</summary>
+          <div class="faq-answer">
+            <p>A entrega é automática. Assim que o pagamento for confirmado, seu pedido entra em processamento imediatamente. No caso de pagamentos via <strong>PIX</strong>, a confirmação costuma ser instantânea.</p>
+            <p>Após a confirmação, você receberá seu jogo em <strong>até 5 minutos</strong>, junto com a key de acesso e as instruções de ativação. Essas informações serão enviadas por <strong>DM no Discord</strong> ou pelo <strong>ticket de compra em nosso servidor</strong>.</p>
+            <p>Em períodos de maior demanda, o prazo de entrega pode variar entre <strong>5 e 10 minutos</strong>.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">Qual é a garantia oferecida?</summary>
+          <div class="faq-answer">
+            <p>Oferecemos garantia de 14 dias corridos a partir da data de entrega. Se o produto estiver inacessível ou não funcionar corretamente no momento da entrega, oferecemos reembolso ou troca por outro produto equivalente, quando disponível.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">Posso compartilhar as credenciais com outras pessoas?</summary>
+          <div class="faq-answer">
+            <p>Não. As credenciais de acesso são pessoais e intransferíveis. O compartilhamento com terceiros pode comprometer o uso do produto e poderá resultar no cancelamento imediato do acesso, sem direito a reembolso.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">O que acontece se eu perder meu progresso no jogo?</summary>
+          <div class="faq-answer">
+            <p>Devido à natureza de alguns produtos e contas compartilhadas, a CallOfStore não se responsabiliza por perda de progresso, arquivos de save ou dados do jogo. Recomendamos sempre que o cliente faça backup dos seus saves localmente, sempre que possível.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">Quais formas de pagamento vocês aceitam?</summary>
+          <div class="faq-answer">
+            <p>Atualmente, aceitamos <strong>apenas PIX</strong>. O pagamento é processado de forma segura e rápida, e a confirmação costuma ser instantânea.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">Como funciona o reembolso?</summary>
+          <div class="faq-answer">
+            <p>O reembolso é disponibilizado apenas nos casos em que o produto estiver inacessível ou não funcionar corretamente no momento da entrega, dentro do prazo de <strong>14 dias corridos</strong>.</p>
+            <p>Após esse período, ou em situações em que o cliente tenha compartilhado credenciais com terceiros, alterado dados de acesso ou utilizado o produto de forma inadequada, <strong>não haverá direito a reembolso</strong>.</p>
+            <p>Quando aprovado, o reembolso será processado em até <strong>14 dias úteis</strong>.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">Posso jogar online com outros jogadores?</summary>
+          <div class="faq-answer">
+            <p>Isso depende do jogo e do tipo de acesso fornecido. Alguns jogos podem permitir funcionalidades online, enquanto outros podem ter o <strong>modo online desabilitado</strong>.</p>
+            <p>Por isso, recomendamos sempre verificar as informações específicas de cada produto antes da compra. Em contas compartilhadas, o uso no <strong>modo offline</strong> costuma ser a opção mais segura para evitar interrupções.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">E se a Steam banir a conta?</summary>
+          <div class="faq-answer">
+            <p>A CallOfStore não se responsabiliza por punições, restrições ou banimentos aplicados pela Steam em decorrência do uso inadequado da conta ou de violações dos termos da plataforma.</p>
+            <p>É responsabilidade do cliente utilizar o acesso recebido de forma correta e dentro das regras da Steam. <strong>Não oferecemos reembolso em casos de banimento por uso indevido.</strong></p>
+          </div>
+        </details>
+      </section>
+
+      <section class="faq-cta" aria-label="Canais de suporte">
+        <h2>Ainda tem dúvidas?</h2>
+        <p>Fale com a nossa equipe pelos canais oficiais e receba suporte rápido para compras, ativação e dúvidas sobre os produtos.</p>
+        <div class="faq-cta-actions">
+          <a class="faq-cta-btn faq-cta-btn--instagram" href="https://www.instagram.com/callofstoreoficial?igsh=NmUxY3BwcWdoYWJt" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-instagram"></i>
+            <span>Chamar no Instagram</span>
+          </a>
+          <a class="faq-cta-btn faq-cta-btn--discord" href="https://discord.gg/Kzp3a7fSFd" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-discord"></i>
+            <span>Entrar no Discord</span>
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="floating-socials" aria-label="Redes sociais">
+    <a class="floating-social-btn" href="https://discord.gg/Kzp3a7fSFd" aria-label="Discord" target="_blank" rel="noopener noreferrer">
+      <i class="fab fa-discord"></i>
+    </a>
+    <a class="floating-social-btn" href="https://www.tiktok.com/@callofstoreofc?_r=1&_t=ZS-93jA9sqNMJD" aria-label="TikTok" target="_blank" rel="noopener noreferrer">
+      <i class="fab fa-tiktok"></i>
+    </a>
+    <a class="floating-social-btn" href="https://www.instagram.com/callofstoreoficial?igsh=NmUxY3BwcWdoYWJt" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+      <i class="fab fa-instagram"></i>
+    </a>
+  </div>
+
+
+  <footer class="site-footer">
+    <div class="site-footer-container">
+      <div class="site-footer-top site-footer-top--compact">
+        <div class="site-footer-brand-column">
+          <div class="site-footer-brand-mark" aria-hidden="true"></div>
+          <p class="site-footer-description">A melhor loja de produtos digitais com entrega via Discord e suporte eficiente.</p>
+          <p class="site-footer-copy-intro">Copyright © CallOfStore - Todos os direitos reservados</p>
+        </div>
+
+        <div class="site-footer-links-column">
+          <h3 class="site-footer-title">Legal</h3>
+          <nav class="site-footer-nav" aria-label="Legal">
+            <a href="#faq">FAQ</a>
+            <a href="#termos-de-uso">Termos de Uso</a>
+            <a href="#politica-de-privacidade">Política de Privacidade</a>
+          </nav>
+        </div>
+
+      </div>
+
+      <div class="site-footer-middle">
+        <p>Desenvolvido por <a class="site-footer-community-link" href="https://discord.gg/Kzp3a7fSFd" target="_blank" rel="noopener noreferrer">CallOfStore Community</a></p>
+      </div>
+
+      <div class="site-footer-bottom">
+        <p>© 2026 CallOfStore - Todos os direitos reservados</p>
+        <div class="site-footer-status">
+          <span class="site-footer-status-item"><i class="site-footer-status-dot is-online"></i>Online</span>
+          <span class="site-footer-status-item"><i class="site-footer-status-dot is-safe"></i>Seguro</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const homeView = document.getElementById('main-content');
+      const aboutView = document.getElementById('sobre-nos');
+      const termsView = document.getElementById('termos-de-uso');
+      const faqView = document.getElementById('faq');
+      const privacyView = document.getElementById('politica-de-privacidade');
+
+      function setView() {
+        const currentHash = window.location.hash;
+        const isAbout = currentHash === '#sobre-nos';
+        const isTerms = currentHash === '#termos-de-uso';
+        const isFaq = currentHash === '#faq';
+        const isPrivacy = currentHash === '#politica-de-privacidade';
+        homeView.hidden = isAbout || isTerms || isFaq || isPrivacy;
+        aboutView.hidden = !isAbout;
+        termsView.hidden = !isTerms;
+        faqView.hidden = !isFaq;
+        privacyView.hidden = !isPrivacy;
+
+        if (isAbout || isTerms || isFaq || isPrivacy) {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+      }
+
+      function closeSupportMenu() {
+        if (!supportToggle || !supportPopover) return;
+        supportPopover.hidden = true;
+        supportToggle.classList.remove('is-open');
+        supportToggle.setAttribute('aria-expanded', 'false');
+      }
+
+      function toggleSupportMenu() {
+        if (!supportToggle || !supportPopover) return;
+        const willOpen = supportPopover.hidden;
+        supportPopover.hidden = !willOpen;
+        supportToggle.classList.toggle('is-open', willOpen);
+        supportToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      }
+
+      if (supportToggle && supportPopover) {
+        supportToggle.addEventListener('click', function (event) {
+          event.stopPropagation();
+          toggleSupportMenu();
+        });
+
+        supportPopover.addEventListener('click', function (event) {
+          event.stopPropagation();
+        });
+
+        document.addEventListener('click', function () {
+          closeSupportMenu();
+        });
+
+        document.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape') {
+            closeSupportMenu();
+          }
+        });
+      }
+
+      const faqItems = Array.from(document.querySelectorAll('.faq-item'));
+      faqItems.forEach(function (item) {
+        item.addEventListener('toggle', function () {
+          if (!item.open) return;
+          faqItems.forEach(function (otherItem) {
+            if (otherItem !== item) {
+              otherItem.open = false;
+            }
+          });
+        });
+      });
+
+      window.addEventListener('hashchange', setView);
+      setView();
+    })();
+  </script>
+  <script src="style.js"></script>
+</body>
+</html>
