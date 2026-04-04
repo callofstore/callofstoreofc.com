@@ -4,6 +4,22 @@ const siteBackgroundArt = {
     size: 'cover',
 };
 
+function getApiBaseUrl() {
+    const explicitBase = window.__CALL_OF_STORE_API_BASE__ || '';
+    if (explicitBase) {
+        return String(explicitBase).replace(/\/$/, '');
+    }
+
+    return window.location.protocol === 'file:'
+        ? 'http://localhost:3000'
+        : '';
+}
+
+function apiUrl(path) {
+    const normalizedPath = String(path || '').startsWith('/') ? String(path) : `/${path}`;
+    return `${getApiBaseUrl()}${normalizedPath}`;
+}
+
 const novidadesProducts = [
     {
         id: 1,
@@ -2008,8 +2024,20 @@ const apenas490Products = [
     imagem: 'https://res.cloudinary.com/dcle0spvc/image/upload/v1774887506/17735005985973401imagem_krxh4p.jpg',
     estoque: 99,
     vendas: 20,
+},{
+    id: 181,
+    slug: 'teste',
+    nome: "teste",
+    categoria: 'apenas-490',
+    precoOriginal: 37.99,
+    precoPromo: 0.010,
+    imagem: 'https://res.cloudinary.com/dcle0spvc/image/upload/v1774887506/17735005985973401imagem_krxh4p.jpg',
+    estoque: 99,
+    vendas: 20,
 },
 ];
+
+
 
 const allProducts = [...novidadesProducts, ...maisPopularesProducts, ...maisJogosProducts, ...apenas490Products];
 
@@ -6663,7 +6691,213 @@ function setupCart() {
             }
             return;
         }
+function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, total }) {
+    const existing = document.getElementById('pixPaymentOverlay');
+    if (existing) existing.remove();
 
+    const qrImage = qrCodeBase64
+        ? `data:image/png;base64,${qrCodeBase64}`
+        : '';
+
+    const formattedTotal = Number.isFinite(Number(total))
+        ? formatPrice(Number(total))
+        : '';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'pixPaymentOverlay';
+    overlay.className = 'pix-payment-overlay';
+
+    overlay.innerHTML = `
+        <div class="pix-payment-modal" role="dialog" aria-modal="true" aria-labelledby="pixPaymentTitle">
+            <button type="button" class="pix-payment-close" id="pixPaymentClose" aria-label="Fechar">
+                <i class="fas fa-xmark"></i>
+            </button>
+
+            <h2 id="pixPaymentTitle" class="pix-payment-title">Pix gerado com sucesso</h2>
+            <p class="pix-payment-subtitle">Pedido #${pedidoId}${formattedTotal ? ` • ${formattedTotal}` : ''}</p>
+
+            <div class="pix-payment-status is-pending" id="pixPaymentStatus">
+                <div class="pix-payment-status-badge" id="pixPaymentStatusBadge">
+                    <i class="fas fa-clock"></i>
+                    <span>Aguardando pagamento</span>
+                </div>
+                <p class="pix-payment-status-text" id="pixPaymentStatusText">
+                    Estamos verificando o seu pagamento automaticamente a cada poucos segundos.
+                </p>
+                <p class="pix-payment-status-meta" id="pixPaymentStatusMeta">
+                    Pague o Pix e deixe esta janela aberta para acompanhar a confirmação.
+                </p>
+            </div>
+
+            ${qrImage ? `
+                <div class="pix-payment-qr-wrap">
+                    <img src="${qrImage}" alt="QR Code do Pix" class="pix-payment-qr-image" />
+                </div>
+            ` : `
+                <div class="pix-payment-qr-empty">
+                    QR Code não disponível.
+                </div>
+            `}
+
+            <label class="pix-payment-label">Código Pix copia e cola</label>
+            <textarea class="pix-payment-code" readonly>${qrCode || ''}</textarea>
+
+            <div class="pix-payment-actions">
+                <button type="button" class="pix-payment-copy" id="pixPaymentCopy">
+                    <i class="fas fa-copy"></i>
+                    Copiar código Pix
+                </button>
+                <button type="button" class="pix-payment-refresh" id="pixPaymentRefresh">
+                    <i class="fas fa-rotate-right"></i>
+                    Verificar agora
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.classList.add('modal-open');
+
+    const closeButton = overlay.querySelector('#pixPaymentClose');
+    const copyButton = overlay.querySelector('#pixPaymentCopy');
+    const refreshButton = overlay.querySelector('#pixPaymentRefresh');
+    const statusCard = overlay.querySelector('#pixPaymentStatus');
+    const statusBadge = overlay.querySelector('#pixPaymentStatusBadge');
+    const statusText = overlay.querySelector('#pixPaymentStatusText');
+    const statusMeta = overlay.querySelector('#pixPaymentStatusMeta');
+
+    let destroyed = false;
+    let isChecking = false;
+    let statusIntervalId = null;
+
+    const statusPresets = {
+        pending: {
+            className: 'is-pending',
+            icon: 'fa-clock',
+            label: 'Aguardando pagamento'
+        },
+        approved: {
+            className: 'is-approved',
+            icon: 'fa-circle-check',
+            label: 'Pagamento aprovado'
+        },
+        delivered: {
+            className: 'is-delivered',
+            icon: 'fa-key',
+            label: 'Key enviada'
+        },
+        cancelled: {
+            className: 'is-cancelled',
+            icon: 'fa-circle-xmark',
+            label: 'Pedido cancelado'
+        }
+    };
+
+    const applyStatusPreset = (presetKey, payload = {}) => {
+        const preset = statusPresets[presetKey] || statusPresets.pending;
+        statusCard.classList.remove('is-pending', 'is-approved', 'is-delivered', 'is-cancelled');
+        statusCard.classList.add(preset.className);
+        statusBadge.innerHTML = `
+            <i class="fas ${preset.icon}"></i>
+            <span>${payload.title || preset.label}</span>
+        `;
+        statusText.textContent = payload.nextAction || 'Estamos atualizando o status do seu pedido automaticamente.';
+        statusMeta.textContent = payload.meta || `Última verificação: ${new Date().toLocaleTimeString('pt-BR')}`;
+    };
+
+    const updateStatus = (payload) => {
+        const status = String(payload?.status || '');
+        const paymentStatus = String(payload?.paymentStatus || '').toLowerCase();
+        const paymentApproved = Boolean(payload?.paymentApproved);
+        const keyDelivered = Boolean(payload?.keyDelivered);
+
+        let presetKey = 'pending';
+
+        if (status === 'cancelado' || ['cancelled', 'rejected', 'refunded', 'charged_back'].includes(paymentStatus)) {
+            presetKey = 'cancelled';
+        } else if (keyDelivered || ['key_enviada', 'finalizado'].includes(status)) {
+            presetKey = 'delivered';
+        } else if (paymentApproved || ['pagamento_aprovado', 'aguardando_entrega'].includes(status) || paymentStatus === 'approved') {
+            presetKey = 'approved';
+        }
+
+        let meta = `Última verificação: ${new Date().toLocaleTimeString('pt-BR')}`;
+        if (paymentStatus) {
+            meta += ` • Status MP: ${paymentStatus}`;
+        }
+
+        applyStatusPreset(presetKey, {
+            ...payload,
+            meta
+        });
+    };
+
+    const verificarStatus = async () => {
+        if (destroyed || isChecking) return;
+        isChecking = true;
+        refreshButton.disabled = true;
+        refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+
+        try {
+            const response = await fetch(apiUrl(`/api/pedidos/${pedidoId}/status?ts=${Date.now()}`), {
+                cache: 'no-store'
+            });
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok || !data?.sucesso) {
+                throw new Error(data?.erro || 'Não foi possível consultar o pedido agora.');
+            }
+
+            updateStatus(data);
+        } catch (error) {
+            console.error(error);
+            applyStatusPreset('pending', {
+                title: 'Aguardando pagamento',
+                nextAction: error.message || 'Não foi possível atualizar o pedido agora. Tente novamente.',
+                meta: `Última tentativa: ${new Date().toLocaleTimeString('pt-BR')}`
+            });
+        } finally {
+            isChecking = false;
+            refreshButton.disabled = false;
+            refreshButton.innerHTML = '<i class="fas fa-rotate-right"></i> Verificar agora';
+        }
+    };
+
+    const closeModal = () => {
+        destroyed = true;
+        if (statusIntervalId) {
+            clearInterval(statusIntervalId);
+            statusIntervalId = null;
+        }
+        overlay.remove();
+        document.body.classList.remove('modal-open');
+    };
+
+    closeButton?.addEventListener('click', closeModal);
+
+    overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) closeModal();
+    });
+
+    copyButton?.addEventListener('click', async () => {
+        if (!qrCode) return;
+
+        try {
+            await navigator.clipboard.writeText(qrCode);
+            alert('Código Pix copiado com sucesso.');
+        } catch (error) {
+            console.error(error);
+            alert('Não foi possível copiar automaticamente.');
+        }
+    });
+
+    refreshButton?.addEventListener('click', () => {
+        verificarStatus();
+    });
+
+    verificarStatus();
+    statusIntervalId = window.setInterval(verificarStatus, 5000);
+}
         const cartButton = event.target.closest('.cart-btn');
         if (cartButton) {
             openCartModal();
@@ -6678,6 +6912,86 @@ function setupCart() {
             return;
         }
 
+        // AQUI entra o botão Gerar Pix
+        const checkoutPrimaryButton = event.target.closest('.checkout-primary-btn');
+        if (checkoutPrimaryButton) {
+            const route = getHashRoute();
+            const checkoutItems = route.type === 'checkout' && route.slug
+                ? [{ product: getProductBySlug(route.slug), quantity: getCheckoutQuantity(getProductBySlug(route.slug)) }]
+                : getCheckoutCartProducts();
+
+            const validItems = checkoutItems
+                .filter(item => item && item.product && item.quantity > 0)
+                .map(item => ({
+                    nome: item.product.nome,
+                    slug: item.product.slug,
+                    preco: item.product.precoPromo,
+                    quantidade: item.quantity
+                }));
+
+            if (!validItems.length) {
+                alert('Seu carrinho está vazio.');
+                return;
+            }
+
+            const nameInput = document.querySelector('input[autocomplete="name"]');
+            const discordInput = document.querySelector('input[placeholder*="usuário"], input[placeholder*="usuário#1234"]');
+            const emailInput = document.querySelector('input[type="email"]');
+
+            const nome = nameInput?.value?.trim();
+            const discordUser = discordInput?.value?.trim();
+            const email = emailInput?.value?.trim();
+
+            if (!nome || !discordUser || !email) {
+                alert('Preencha nome, Discord e email antes de gerar o Pix.');
+                return;
+            }
+
+            const pricing = route.type === 'checkout' && route.slug
+                ? getCheckoutPricing(getProductBySlug(route.slug))
+                : getCheckoutCartPricing();
+
+            checkoutPrimaryButton.disabled = true;
+            const originalHtml = checkoutPrimaryButton.innerHTML;
+            checkoutPrimaryButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando Pix...';
+
+            fetch(apiUrl('/api/checkout/pix'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    cliente: { nome },
+                    discordUser,
+                    email,
+                    jogos: validItems
+                })
+            })
+           .then(async (response) => {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data?.sucesso) {
+        throw new Error(data?.erro || 'Falha ao gerar Pix.');
+    }
+
+    showPixPaymentModal({
+        pedidoId: data.pedidoId,
+        qrCode: data.qr_code || '',
+        qrCodeBase64: data.qr_code_base64 || '',
+        total: data.total
+    });
+})
+            .catch((error) => {
+                alert(`Erro ao gerar Pix: ${error.message}`);
+                console.error(error);
+            })
+            .finally(() => {
+                checkoutPrimaryButton.disabled = false;
+                checkoutPrimaryButton.innerHTML = originalHtml;
+            });
+
+            return;
+        }
+
         const primaryBuyButton = event.target.closest('.product-page-primary-btn');
         if (primaryBuyButton) {
             const route = getHashRoute();
@@ -6685,61 +6999,6 @@ function setupCart() {
                 startCheckoutWithProduct(route.slug);
             }
             return;
-        }
-
-        const removeButton = event.target.closest('[data-cart-remove]');
-        if (removeButton) {
-            setCartItemQuantity(removeButton.dataset.cartRemove, 0);
-            return;
-        }
-
-        const increaseButton = event.target.closest('[data-cart-increase]');
-        if (increaseButton) {
-            const item = cartState.items.find((cartItem) => cartItem.slug === increaseButton.dataset.cartIncrease);
-            setCartItemQuantity(increaseButton.dataset.cartIncrease, (item?.quantity || 0) + 1);
-            return;
-        }
-
-        const decreaseButton = event.target.closest('[data-cart-decrease]');
-        if (decreaseButton) {
-            const item = cartState.items.find((cartItem) => cartItem.slug === decreaseButton.dataset.cartDecrease);
-            setCartItemQuantity(decreaseButton.dataset.cartDecrease, (item?.quantity || 0) - 1);
-            return;
-        }
-
-        const modalBuyButton = event.target.closest('.cart-modal-buy-btn');
-        if (modalBuyButton) {
-            if (cartState.items.length) {
-                closeCartModal();
-                openCartCheckoutPage();
-            }
-            return;
-        }
-
-        const closeButton = event.target.closest('#cartModalClose');
-        if (closeButton) {
-            closeCartModal();
-            return;
-        }
-
-        const overlay = event.target.closest('#cartModalOverlay');
-        const panel = event.target.closest('#cartModal');
-        if (overlay && !panel) {
-            closeCartModal();
-        }
-    });
-
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' && event.target.matches('[data-checkout-coupon-input]')) {
-            applyCheckoutCoupon(event.target.value || '');
-            rerenderCheckoutFromRoute();
-        }
-    });
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            closeCartModal();
         }
     });
 }
