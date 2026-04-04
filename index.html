@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <link rel="stylesheet" href="site.css" />
+  <link rel="stylesheet" href="site-corrigido.css" />
   <style>
     .header-tools {
       flex: 1;
@@ -997,6 +997,9 @@
 
   <header class="header">
     <div class="header-container">
+      <button class="mobile-back-btn" type="button" aria-label="Voltar" onclick="if(window.history.length > 1){ window.history.back(); } else { window.location.href = 'index.html'; }">
+        <i class="fas fa-arrow-left"></i>
+      </button>
       <a class="logo-area logo-link" href="index.html" aria-label="Voltar para a home CallOfStore">
         <span class="logo-text hacker-logo" data-text="CallOfStore">CallOfStore</span>
       </a>
@@ -1157,7 +1160,7 @@
           <article class="about-feature about-feature--purple">
             <div class="about-icon"><i class="fas fa-bolt"></i></div>
             <h3>Entrega Rápida</h3>
-            <p>Receba seus jogos via Discord em até 5 minutos após a confirmação do pagamento.</p>
+            <p>Receba seus jogos via Discord em até 5 minutos após a confirmação do pagamento e a liberação da entrega pela equipe.</p>
           </article>
 
           <article class="about-feature about-feature--gold">
@@ -1422,8 +1425,8 @@
         <details class="faq-item">
           <summary class="faq-question">Quanto tempo leva para receber meus produtos após o pagamento?</summary>
           <div class="faq-answer">
-            <p>A entrega é automática. Assim que o pagamento for confirmado, seu pedido entra em processamento imediatamente. No caso de pagamentos via <strong>PIX</strong>, a confirmação costuma ser instantânea.</p>
-            <p>Após a confirmação, você receberá seu jogo em <strong>até 5 minutos</strong>, junto com a key de acesso e as instruções de ativação. Essas informações serão enviadas por <strong>DM no Discord</strong> ou pelo <strong>ticket de compra em nosso servidor</strong>.</p>
+            <p>Assim que o pagamento for confirmado, seu pedido é liberado automaticamente para a equipe no Discord. No caso de pagamentos via <strong>PIX</strong>, a confirmação costuma ser instantânea.</p>
+            <p>Após a confirmação, a equipe envia seu jogo em <strong>até 5 minutos</strong>, junto com a key de acesso e as instruções de ativação. Essas informações serão enviadas por <strong>DM no Discord</strong> ou pelo <strong>ticket de compra em nosso servidor</strong>.</p>
             <p>Em períodos de maior demanda, o prazo de entrega pode variar entre <strong>5 e 10 minutos</strong>.</p>
           </div>
         </details>
@@ -1623,6 +1626,6 @@
       setView();
     })();
   </script>
-  <script src="style.js"></script>
+  <script src="style-corrigido.js"></script>
 </body>
 </html>
