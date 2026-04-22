@@ -6701,11 +6701,17 @@ function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, expiresInMs, expi
 
     const fallbackDurationMs = 15 * 60 * 1000;
     const parsedExpiresInMs = Number(expiresInMs);
-    const deadline = Number.isFinite(Number(expiresAt))
-        ? Number(expiresAt)
-        : (typeof expiresAt === 'string' && !Number.isNaN(Date.parse(expiresAt))
-            ? Date.parse(expiresAt)
-            : Date.now() + (Number.isFinite(parsedExpiresInMs) && parsedExpiresInMs > 0 ? parsedExpiresInMs : fallbackDurationMs));
+    const parsedExpiresAt = Number(expiresAt);
+    const parsedExpiresAtFromString = typeof expiresAt === 'string' && !Number.isNaN(Date.parse(expiresAt))
+        ? Date.parse(expiresAt)
+        : null;
+    const deadline = Number.isFinite(parsedExpiresInMs) && parsedExpiresInMs > 1000
+        ? Date.now() + parsedExpiresInMs
+        : (Number.isFinite(parsedExpiresAt) && parsedExpiresAt > Date.now() + 1000
+            ? parsedExpiresAt
+            : (parsedExpiresAtFromString && parsedExpiresAtFromString > Date.now() + 1000
+                ? parsedExpiresAtFromString
+                : Date.now() + fallbackDurationMs));
 
     const overlay = document.createElement('div');
     overlay.id = 'pixPaymentOverlay';
@@ -6769,6 +6775,7 @@ function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, expiresInMs, expi
     const timerValue = overlay.querySelector('#pixPaymentTimerValue');
     let timerInterval = null;
     let keydownHandler = null;
+    let autoCancelTriggered = false;
 
     const formatTimer = (remainingMs) => {
         const totalSeconds = Math.max(0, Math.floor(remainingMs / 1000));
@@ -6786,9 +6793,15 @@ function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, expiresInMs, expi
             timerRoot.classList.toggle('is-warning', remainingMs > 0 && remainingMs <= 5 * 60 * 1000);
             timerRoot.classList.toggle('is-expired', remainingMs <= 0);
         }
-        if (remainingMs <= 0 && timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
+        if (remainingMs <= 0) {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            if (!autoCancelTriggered) {
+                autoCancelTriggered = true;
+                cancelPurchase({ automatic: true });
+            }
         }
     };
 
@@ -6808,31 +6821,40 @@ function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, expiresInMs, expi
         }
     };
 
-    const cancelPurchase = async () => {
+    const cancelPurchase = async ({ automatic = false } = {}) => {
         if (!pedidoId) {
-            alert('Não foi possível identificar o pedido para cancelar.');
+            if (!automatic) alert('Não foi possível identificar o pedido para cancelar.');
             return;
         }
 
-        const confirmar = window.confirm('Tem certeza que deseja cancelar esta compra?');
-        if (!confirmar) return;
+        if (!automatic) {
+            const confirmar = window.confirm('Tem certeza que deseja cancelar esta compra?');
+            if (!confirmar) return;
+        }
 
         try {
             const response = await fetch(apiUrl(`/api/pedidos/${pedidoId}/cancelar`), {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason: automatic ? 'timeout_pagamento' : 'cancelado_cliente' })
             });
 
             const data = await response.json().catch(() => ({}));
-            if (!response.ok || !data?.sucesso) {
+            if (!response.ok && response.status !== 409) {
                 throw new Error(data?.erro || 'Não foi possível cancelar a compra.');
             }
 
             closeModal();
-            alert('Compra cancelada com sucesso.');
+            if (automatic) {
+                alert('O tempo de pagamento expirou. A compra foi cancelada automaticamente.');
+            } else {
+                alert('Compra cancelada com sucesso.');
+            }
         } catch (error) {
             console.error(error);
-            alert(`Erro ao cancelar a compra: ${error.message}`);
+            if (!automatic) {
+                alert(`Erro ao cancelar a compra: ${error.message}`);
+            }
         }
     };
 
