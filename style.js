@@ -6691,7 +6691,7 @@ function setupCart() {
             }
             return;
         }
-function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, total }) {
+function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, expiresInMs, expiresAt }) {
     const existing = document.getElementById('pixPaymentOverlay');
     if (existing) existing.remove();
 
@@ -6699,9 +6699,13 @@ function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, total }) {
         ? `data:image/png;base64,${qrCodeBase64}`
         : '';
 
-    const formattedTotal = Number.isFinite(Number(total))
-        ? formatPrice(Number(total))
-        : '';
+    const fallbackDurationMs = 15 * 60 * 1000;
+    const parsedExpiresInMs = Number(expiresInMs);
+    const deadline = Number.isFinite(Number(expiresAt))
+        ? Number(expiresAt)
+        : (typeof expiresAt === 'string' && !Number.isNaN(Date.parse(expiresAt))
+            ? Date.parse(expiresAt)
+            : Date.now() + (Number.isFinite(parsedExpiresInMs) && parsedExpiresInMs > 0 ? parsedExpiresInMs : fallbackDurationMs));
 
     const overlay = document.createElement('div');
     overlay.id = 'pixPaymentOverlay';
@@ -6714,19 +6718,16 @@ function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, total }) {
             </button>
 
             <h2 id="pixPaymentTitle" class="pix-payment-title">Pix gerado com sucesso</h2>
-            <p class="pix-payment-subtitle">Pedido #${pedidoId}${formattedTotal ? ` • ${formattedTotal}` : ''}</p>
+            <p class="pix-payment-subtitle">Pedido #${pedidoId}</p>
 
-            <div class="pix-payment-status is-pending" id="pixPaymentStatus">
-                <div class="pix-payment-status-badge" id="pixPaymentStatusBadge">
-                    <i class="fas fa-clock"></i>
-                    <span>Aguardando pagamento</span>
+            <div class="pix-payment-timer" id="pixPaymentTimer">
+                <div class="pix-payment-timer-icon" aria-hidden="true">
+                    <i class="far fa-clock"></i>
                 </div>
-                <p class="pix-payment-status-text" id="pixPaymentStatusText">
-                    Estamos verificando o seu pagamento automaticamente a cada poucos segundos.
-                </p>
-                <p class="pix-payment-status-meta" id="pixPaymentStatusMeta">
-                    Pague o Pix e deixe esta janela aberta para acompanhar a confirmação.
-                </p>
+                <div class="pix-payment-timer-content">
+                    <span class="pix-payment-timer-label">Acaba em:</span>
+                    <strong class="pix-payment-timer-value" id="pixPaymentTimerValue">00d 00h 15m 00s</strong>
+                </div>
             </div>
 
             ${qrImage ? `
@@ -6742,14 +6743,20 @@ function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, total }) {
             <label class="pix-payment-label">Código Pix copia e cola</label>
             <textarea class="pix-payment-code" readonly>${qrCode || ''}</textarea>
 
+            <p class="pix-payment-note">Fechar esta janela não cancela a compra. Use o botão vermelho abaixo caso queira cancelar.</p>
+
             <div class="pix-payment-actions">
                 <button type="button" class="pix-payment-copy" id="pixPaymentCopy">
                     <i class="fas fa-copy"></i>
                     Copiar código Pix
                 </button>
-                <button type="button" class="pix-payment-refresh" id="pixPaymentRefresh">
-                    <i class="fas fa-rotate-right"></i>
-                    Verificar agora
+                <button type="button" class="pix-payment-secondary" id="pixPaymentKeepWaiting">
+                    <i class="fas fa-clock"></i>
+                    Continuar aguardando
+                </button>
+                <button type="button" class="pix-payment-cancel" id="pixPaymentCancel">
+                    <i class="fas fa-ban"></i>
+                    Cancelar compra
                 </button>
             </div>
         </div>
@@ -6758,128 +6765,93 @@ function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, total }) {
     document.body.appendChild(overlay);
     document.body.classList.add('modal-open');
 
-    const closeButton = overlay.querySelector('#pixPaymentClose');
-    const copyButton = overlay.querySelector('#pixPaymentCopy');
-    const refreshButton = overlay.querySelector('#pixPaymentRefresh');
-    const statusCard = overlay.querySelector('#pixPaymentStatus');
-    const statusBadge = overlay.querySelector('#pixPaymentStatusBadge');
-    const statusText = overlay.querySelector('#pixPaymentStatusText');
-    const statusMeta = overlay.querySelector('#pixPaymentStatusMeta');
+    const timerRoot = overlay.querySelector('#pixPaymentTimer');
+    const timerValue = overlay.querySelector('#pixPaymentTimerValue');
+    let timerInterval = null;
+    let keydownHandler = null;
 
-    let destroyed = false;
-    let isChecking = false;
-    let statusIntervalId = null;
+    const formatTimer = (remainingMs) => {
+        const totalSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        return `${String(days).padStart(2, '0')}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+    };
 
-    const statusPresets = {
-        pending: {
-            className: 'is-pending',
-            icon: 'fa-clock',
-            label: 'Aguardando pagamento'
-        },
-        approved: {
-            className: 'is-approved',
-            icon: 'fa-circle-check',
-            label: 'Pagamento aprovado'
-        },
-        delivered: {
-            className: 'is-delivered',
-            icon: 'fa-key',
-            label: 'Key enviada'
-        },
-        cancelled: {
-            className: 'is-cancelled',
-            icon: 'fa-circle-xmark',
-            label: 'Pedido cancelado'
+    const updateTimer = () => {
+        const remainingMs = Math.max(0, deadline - Date.now());
+        if (timerValue) timerValue.textContent = formatTimer(remainingMs);
+        if (timerRoot) {
+            timerRoot.classList.toggle('is-warning', remainingMs > 0 && remainingMs <= 5 * 60 * 1000);
+            timerRoot.classList.toggle('is-expired', remainingMs <= 0);
+        }
+        if (remainingMs <= 0 && timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
         }
     };
 
-    const applyStatusPreset = (presetKey, payload = {}) => {
-        const preset = statusPresets[presetKey] || statusPresets.pending;
-        statusCard.classList.remove('is-pending', 'is-approved', 'is-delivered', 'is-cancelled');
-        statusCard.classList.add(preset.className);
-        statusBadge.innerHTML = `
-            <i class="fas ${preset.icon}"></i>
-            <span>${payload.title || preset.label}</span>
-        `;
-        statusText.textContent = payload.nextAction || 'Estamos atualizando o status do seu pedido automaticamente.';
-        statusMeta.textContent = payload.meta || `Última verificação: ${new Date().toLocaleTimeString('pt-BR')}`;
-    };
-
-    const updateStatus = (payload) => {
-        const status = String(payload?.status || '');
-        const paymentStatus = String(payload?.paymentStatus || '').toLowerCase();
-        const paymentApproved = Boolean(payload?.paymentApproved);
-        const keyDelivered = Boolean(payload?.keyDelivered);
-
-        let presetKey = 'pending';
-
-        if (status === 'cancelado' || ['cancelled', 'rejected', 'refunded', 'charged_back'].includes(paymentStatus)) {
-            presetKey = 'cancelled';
-        } else if (keyDelivered || ['key_enviada', 'finalizado'].includes(status)) {
-            presetKey = 'delivered';
-        } else if (paymentApproved || ['pagamento_aprovado', 'aguardando_entrega'].includes(status) || paymentStatus === 'approved') {
-            presetKey = 'approved';
-        }
-
-        let meta = `Última verificação: ${new Date().toLocaleTimeString('pt-BR')}`;
-        if (paymentStatus) {
-            meta += ` • Status MP: ${paymentStatus}`;
-        }
-
-        applyStatusPreset(presetKey, {
-            ...payload,
-            meta
-        });
-    };
-
-    const verificarStatus = async () => {
-        if (destroyed || isChecking) return;
-        isChecking = true;
-        refreshButton.disabled = true;
-        refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
-
-        try {
-            const response = await fetch(apiUrl(`/api/pedidos/${pedidoId}/status?ts=${Date.now()}`), {
-                cache: 'no-store'
-            });
-            const data = await response.json().catch(() => ({}));
-
-            if (!response.ok || !data?.sucesso) {
-                throw new Error(data?.erro || 'Não foi possível consultar o pedido agora.');
-            }
-
-            updateStatus(data);
-        } catch (error) {
-            console.error(error);
-            applyStatusPreset('pending', {
-                title: 'Aguardando pagamento',
-                nextAction: error.message || 'Não foi possível atualizar o pedido agora. Tente novamente.',
-                meta: `Última tentativa: ${new Date().toLocaleTimeString('pt-BR')}`
-            });
-        } finally {
-            isChecking = false;
-            refreshButton.disabled = false;
-            refreshButton.innerHTML = '<i class="fas fa-rotate-right"></i> Verificar agora';
-        }
-    };
+    updateTimer();
+    timerInterval = window.setInterval(updateTimer, 1000);
 
     const closeModal = () => {
-        destroyed = true;
-        if (statusIntervalId) {
-            clearInterval(statusIntervalId);
-            statusIntervalId = null;
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
         }
         overlay.remove();
         document.body.classList.remove('modal-open');
+        if (keydownHandler) {
+            document.removeEventListener('keydown', keydownHandler);
+            keydownHandler = null;
+        }
     };
 
-    closeButton?.addEventListener('click', closeModal);
+    const cancelPurchase = async () => {
+        if (!pedidoId) {
+            alert('Não foi possível identificar o pedido para cancelar.');
+            return;
+        }
+
+        const confirmar = window.confirm('Tem certeza que deseja cancelar esta compra?');
+        if (!confirmar) return;
+
+        try {
+            const response = await fetch(apiUrl(`/api/pedidos/${pedidoId}/cancelar`), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || !data?.sucesso) {
+                throw new Error(data?.erro || 'Não foi possível cancelar a compra.');
+            }
+
+            closeModal();
+            alert('Compra cancelada com sucesso.');
+        } catch (error) {
+            console.error(error);
+            alert(`Erro ao cancelar a compra: ${error.message}`);
+        }
+    };
+
+    overlay.querySelector('#pixPaymentClose')?.addEventListener('click', closeModal);
+    overlay.querySelector('#pixPaymentKeepWaiting')?.addEventListener('click', closeModal);
+    overlay.querySelector('#pixPaymentCancel')?.addEventListener('click', cancelPurchase);
 
     overlay.addEventListener('click', (event) => {
         if (event.target === overlay) closeModal();
     });
 
-    copyButton?.addEventListener('click', async () => {
+    keydownHandler = (event) => {
+        if (event.key !== 'Escape') return;
+        if (!document.getElementById('pixPaymentOverlay')) return;
+        closeModal();
+    };
+    document.addEventListener('keydown', keydownHandler);
+
+    overlay.querySelector('#pixPaymentCopy')?.addEventListener('click', async () => {
         if (!qrCode) return;
 
         try {
@@ -6890,13 +6862,6 @@ function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, total }) {
             alert('Não foi possível copiar automaticamente.');
         }
     });
-
-    refreshButton?.addEventListener('click', () => {
-        verificarStatus();
-    });
-
-    verificarStatus();
-    statusIntervalId = window.setInterval(verificarStatus, 5000);
 }
         const cartButton = event.target.closest('.cart-btn');
         if (cartButton) {
@@ -6964,7 +6929,8 @@ function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, total }) {
                     cliente: { nome },
                     discordUser,
                     email,
-                    jogos: validItems
+                    jogos: validItems,
+                    total: pricing.total
                 })
             })
            .then(async (response) => {
@@ -6977,7 +6943,8 @@ function showPixPaymentModal({ pedidoId, qrCode, qrCodeBase64, total }) {
         pedidoId: data.pedidoId,
         qrCode: data.qr_code || '',
         qrCodeBase64: data.qr_code_base64 || '',
-        total: data.total
+        expiresInMs: Number(data.expiresInMs) || (15 * 60 * 1000),
+        expiresAt: data.expiresAt || data.expiresAtIso || null
     });
 })
             .catch((error) => {
